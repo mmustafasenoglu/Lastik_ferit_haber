@@ -1,0 +1,409 @@
+/* ===============================================
+   LOGIN PAGE STYLES
+   =============================================== */
+
+:root {
+    --primary: #1a1a2e;
+    --secondary: #16213e;
+    --accent: #0f4c75;
+    --accent-light: #3282b8;
+    --success: #00d9a3;
+    --danger: #ff6b6b;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --border: #2a2a3e;
+    --bg-card: #1f1f35;
+    --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    overflow: hidden;
+}
+
+/* ===============================================
+   LOGIN CONTAINER
+   =============================================== */
+
+.login-container {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* ===============================================
+   LOGIN BOX
+   =============================================== */
+
+.login-box {
+    position: relative;
+    z-index: 10;
+    background: rgba(31, 31, 53, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 48px;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: var(--shadow-lg);
+    animation: slideIn 0.6s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===============================================
+   HEADER
+   =============================================== */
+
+.login-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.logo-container {
+    margin-bottom: 24px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.lock-icon {
+    color: var(--accent-light);
+    filter: drop-shadow(0 4px 12px rgba(50, 130, 184, 0.4));
+}
+
+.login-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    background: var(--gradient-1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+}
+
+.login-header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* ===============================================
+   FORM
+   =============================================== */
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.form-label svg {
+    color: var(--accent-light);
+}
+
+.form-input {
+    width: 100%;
+    padding: 16px 18px;
+    background: var(--secondary);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--accent-light);
+    box-shadow: 0 0 0 4px rgba(50, 130, 184, 0.1);
+    background: rgba(22, 33, 62, 0.8);
+}
+
+.form-input::placeholder {
+    color: var(--text-secondary);
+}
+
+/* ===============================================
+   ERROR MESSAGE
+   =============================================== */
+
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid var(--danger);
+    border-radius: 10px;
+    color: var(--danger);
+    font-size: 0.9rem;
+    animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-10px);
+    }
+
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+.error-message svg {
+    flex-shrink: 0;
+}
+
+/* ===============================================
+   BUTTON
+   =============================================== */
+
+.login-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 16px 24px;
+    background: var(--gradient-1);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    margin-top: 8px;
+}
+
+.login-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.login-button:active {
+    transform: translateY(0);
+}
+
+.login-button svg {
+    transition: transform 0.3s ease;
+}
+
+.login-button:hover svg {
+    transform: translateX(4px);
+}
+
+/* ===============================================
+   FOOTER
+   =============================================== */
+
+.login-footer {
+    margin-top: 32px;
+    text-align: center;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.back-link:hover {
+    color: var(--accent-light);
+    gap: 10px;
+}
+
+.back-link svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ===============================================
+   PARTICLES BACKGROUND
+   =============================================== */
+
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--accent-light);
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: float linear infinite;
+}
+
+.particle:nth-child(1) {
+    left: 10%;
+    animation-duration: 15s;
+    animation-delay: 0s;
+}
+
+.particle:nth-child(2) {
+    left: 20%;
+    animation-duration: 20s;
+    animation-delay: 2s;
+}
+
+.particle:nth-child(3) {
+    left: 30%;
+    animation-duration: 18s;
+    animation-delay: 4s;
+}
+
+.particle:nth-child(4) {
+    left: 40%;
+    animation-duration: 22s;
+    animation-delay: 1s;
+}
+
+.particle:nth-child(5) {
+    left: 50%;
+    animation-duration: 17s;
+    animation-delay: 3s;
+}
+
+.particle:nth-child(6) {
+    left: 60%;
+    animation-duration: 19s;
+    animation-delay: 5s;
+}
+
+.particle:nth-child(7) {
+    left: 70%;
+    animation-duration: 21s;
+    animation-delay: 2s;
+}
+
+.particle:nth-child(8) {
+    left: 80%;
+    animation-duration: 16s;
+    animation-delay: 4s;
+}
+
+.particle:nth-child(9) {
+    left: 90%;
+    animation-duration: 23s;
+    animation-delay: 1s;
+}
+
+.particle:nth-child(10) {
+    left: 95%;
+    animation-duration: 20s;
+    animation-delay: 3s;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.3;
+    }
+
+    90% {
+        opacity: 0.3;
+    }
+
+    100% {
+        transform: translateY(-100vh) scale(1);
+        opacity: 0;
+    }
+}
+
+/* ===============================================
+   RESPONSIVE
+   =============================================== */
+
+@media (max-width: 768px) {
+    .login-box {
+        padding: 32px 24px;
+    }
+
+    .login-header h1 {
+        font-size: 2rem;
+    }
+
+    .lock-icon {
+        width: 48px;
+        height: 48px;
+    }
+}
