@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #1e3a8a; /* Lacivert (blue-900) */
+  --color-secondary: #f3f4f6; /* Gri/Beyazımsı (gray-100) */
+  --color-accent: #6b7280; /* Gri (gray-500) */
+  --color-background: #ffffff; /* Beyaz */
+  --color-text: #111827; /* Koyu Gri (gray-900) */
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text);
+}

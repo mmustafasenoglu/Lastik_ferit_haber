@@ -1,0 +1,262 @@
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+const AdminDashboard = () => {
+  const [news, setNews] = useState([]);
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+
+  // Profil ayarları
+  const [profilePhoto, setProfilePhoto] = useState('');
+  const [bio, setBio] = useState('');
+  const [bio2, setBio2] = useState('');
+  const [bio3, setBio3] = useState('');
+  const [settingsSaved, setSettingsSaved] = useState(false);
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoError, setPhotoError] = useState('');
+  const [dragOver, setDragOver] = useState(false);
+
+  const navigate = useNavigate();
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    if (!token) { navigate('/admin'); return; }
+    fetchNews();
+    fetchSettings();
+  }, [token, navigate]);
+
+  const fetchNews = async () => {
+    try {
+      const res = await axios.get('http://localhost:5001/api/news');
+      setNews(res.data);
+    } catch (err) { console.error(err); }
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const res = await axios.get('http://localhost:5001/api/settings');
+      setProfilePhoto(res.data.profilePhoto || '');
+      setBio(res.data.bio || '');
+      setBio2(res.data.bio2 || '');
+      setBio3(res.data.bio3 || '');
+    } catch (err) { console.error(err); }
+  };
+
+  const handlePhotoUpload = async (file) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setPhotoError('Sadece görsel dosyası yükleyebilirsiniz.');
+      return;
+    }
+    setPhotoError('');
+    setPhotoUploading(true);
+    const formData = new FormData();
+    formData.append('photo', file);
+    try {
+      const res = await axios.post('http://localhost:5001/api/upload/profile', formData, {
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
+      });
+      setProfilePhoto(res.data.photoUrl);
+      // biyografiyi de kaydet
+      await axios.put('http://localhost:5001/api/settings',
+        { profilePhoto: res.data.photoUrl, bio, bio2, bio3 },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setSettingsSaved(true);
+      setTimeout(() => setSettingsSaved(false), 3000);
+    } catch (err) {
+      setPhotoError('Yükleme başarısız. Tekrar deneyin.');
+    } finally {
+      setPhotoUploading(false);
+    }
+  };
+
+  const handleSaveSettings = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put('http://localhost:5001/api/settings',
+        { profilePhoto, bio, bio2, bio3 },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setSettingsSaved(true);
+      setTimeout(() => setSettingsSaved(false), 3000);
+    } catch (err) { console.error('Ayarlar kaydedilemedi.', err); }
+  };
+
+  const handleAddNews = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:5001/api/news',
+        { title, content, imageUrl },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setTitle(''); setContent(''); setImageUrl('');
+      fetchNews();
+    } catch (err) { console.error('Haber eklenemedi.', err); }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Bu haberi silmek istediğinize emin misiniz?')) return;
+    try {
+      await axios.delete(`http://localhost:5001/api/news/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchNews();
+    } catch (err) { console.error('Silme hatası.', err); }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/admin');
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-8">
+      <div className="max-w-6xl mx-auto space-y-8">
+
+        {/* Üst Bar */}
+        <div className="flex justify-between items-center bg-white p-6 rounded-lg shadow">
+          <div>
+            <h1 className="text-3xl font-bold text-primary">Yönetim Paneli</h1>
+            <p className="text-gray-500 text-sm mt-1">Ferit Tercan Portfolyo Sitesi</p>
+          </div>
+          <button onClick={handleLogout} className="bg-red-500 text-white px-5 py-2 rounded-lg hover:bg-red-600 font-medium transition">
+            Çıkış Yap
+          </button>
+        </div>
+
+        {/* ===== PROFİL AYARLARI ===== */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-bold mb-6 text-gray-800 border-b pb-3 flex items-center gap-2">
+            🖼️ Profil & Biyografi Ayarları
+          </h2>
+          <form onSubmit={handleSaveSettings} className="space-y-5">
+            {/* Fotoğraf Yükleme */}
+            <div className="flex flex-col lg:flex-row gap-6 items-start">
+              <div className="flex-1">
+                <label className="block text-gray-700 text-sm font-bold mb-3">Profil Fotoğrafı</label>
+
+                {/* Drag & Drop Alan */}
+                <div
+                  className={`relative border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all
+                    ${dragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'}`}
+                  onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={e => { e.preventDefault(); setDragOver(false); handlePhotoUpload(e.dataTransfer.files[0]); }}
+                  onClick={() => document.getElementById('profilePhotoInput').click()}
+                >
+                  <input
+                    id="profilePhotoInput"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={e => handlePhotoUpload(e.target.files[0])}
+                  />
+                  {photoUploading ? (
+                    <div className="flex flex-col items-center gap-2 py-2">
+                      <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-blue-600 font-medium text-sm">Yükleniyor...</span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2 py-2">
+                      <span className="text-4xl">📁</span>
+                      <p className="text-gray-600 font-medium">Tıkla veya sürükle bırak</p>
+                      <p className="text-gray-400 text-xs">PNG, JPG, WEBP — Maks. 5MB</p>
+                    </div>
+                  )}
+                </div>
+                {photoError && <p className="text-red-500 text-sm mt-2">{photoError}</p>}
+              </div>
+
+              {/* Önizleme */}
+              <div className="flex flex-col items-center gap-2 flex-shrink-0">
+                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow">
+                  {profilePhoto ? (
+                    <img src={profilePhoto} alt="Önizleme" className="w-full h-full object-cover"
+                      onError={e => { e.target.src = 'https://via.placeholder.com/128'; }} />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 text-xs text-center p-2">Önizleme</div>
+                  )}
+                </div>
+                <span className="text-xs text-gray-400">Mevcut fotoğraf</span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Biyografi 1. Paragraf</label>
+              <textarea className="w-full p-3 border rounded-lg focus:outline-none focus:border-blue-500 h-20" value={bio} onChange={e => setBio(e.target.value)} />
+            </div>
+            <div>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Biyografi 2. Paragraf</label>
+              <textarea className="w-full p-3 border rounded-lg focus:outline-none focus:border-blue-500 h-20" value={bio2} onChange={e => setBio2(e.target.value)} />
+            </div>
+            <div>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Biyografi 3. Paragraf</label>
+              <textarea className="w-full p-3 border rounded-lg focus:outline-none focus:border-blue-500 h-20" value={bio3} onChange={e => setBio3(e.target.value)} />
+            </div>
+
+            <div className="flex items-center gap-4">
+              <button type="submit" className="bg-blue-700 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-800 transition">
+                Değişiklikleri Kaydet
+              </button>
+              {settingsSaved && <span className="text-green-600 font-semibold">✅ Kaydedildi! Sayfayı yenile.</span>}
+            </div>
+          </form>
+        </div>
+
+        {/* ===== HABERLER ===== */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Haber Ekle Formu */}
+          <div className="bg-white p-6 rounded-lg shadow lg:col-span-1 h-fit">
+            <h2 className="text-xl font-bold mb-4 text-gray-800 border-b pb-2">📰 Yeni Haber Ekle</h2>
+            <form onSubmit={handleAddNews} className="space-y-4">
+              <div>
+                <label className="block text-gray-700 text-sm font-bold mb-2">Başlık</label>
+                <input type="text" className="w-full p-2 border rounded focus:outline-none focus:border-blue-500" value={title} onChange={e => setTitle(e.target.value)} required />
+              </div>
+              <div>
+                <label className="block text-gray-700 text-sm font-bold mb-2">Görsel URL</label>
+                <input type="text" className="w-full p-2 border rounded focus:outline-none focus:border-blue-500" value={imageUrl} onChange={e => setImageUrl(e.target.value)} />
+              </div>
+              <div>
+                <label className="block text-gray-700 text-sm font-bold mb-2">İçerik</label>
+                <textarea className="w-full p-2 border rounded focus:outline-none focus:border-blue-500 h-32" value={content} onChange={e => setContent(e.target.value)} required></textarea>
+              </div>
+              <button type="submit" className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700">
+                Kaydet
+              </button>
+            </form>
+          </div>
+
+          {/* Haber Listesi */}
+          <div className="bg-white p-6 rounded-lg shadow lg:col-span-2">
+            <h2 className="text-xl font-bold mb-4 text-gray-800 border-b pb-2">📋 Mevcut Haberler</h2>
+            <div className="space-y-4">
+              {news.map(item => (
+                <div key={item.id} className="flex justify-between items-center bg-gray-50 p-4 rounded border hover:border-blue-300 transition">
+                  <div className="flex items-center gap-4">
+                    {item.imageUrl && (
+                      <img src={item.imageUrl} alt={item.title} className="w-14 h-14 object-cover rounded-lg" onError={e => { e.target.style.display='none'; }} />
+                    )}
+                    <div>
+                      <h3 className="font-bold text-lg text-primary">{item.title}</h3>
+                      <p className="text-sm text-gray-500">{new Date(item.date).toLocaleDateString('tr-TR')}</p>
+                    </div>
+                  </div>
+                  <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:text-red-700 font-bold px-3 py-1 rounded hover:bg-red-50 transition">
+                    Sil
+                  </button>
+                </div>
+              ))}
+              {news.length === 0 && <p className="text-gray-500 text-center py-8">Henüz haber eklenmemiş.</p>}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminDashboard;
