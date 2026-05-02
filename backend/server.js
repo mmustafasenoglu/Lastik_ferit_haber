@@ -1,61 +1,58 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs');
 const path = require('path');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
+
+const Settings = require('./models/Settings');
 const newsRoutes = require('./routes/news');
-const settingsRoutes = require('./routes/settings');
 
 const app = express();
-const PORT = process.env.PORT || 5001;
-const SECRET_KEY = process.env.JWT_SECRET || 'ferit123supersecret';
-
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors());
 app.use(express.json());
 
-// Yüklenen görselleri statik olarak sun
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// JWT Secret
+const SECRET_KEY = process.env.JWT_SECRET || 'ferit123supersecret';
 
-// Multer — Profil fotoğrafı yükleme
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, 'uploads')),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `profile-${Date.now()}${ext}`);
-  }
-});
-const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) cb(null, true);
-    else cb(new Error('Sadece görsel dosyaları yüklenebilir.'));
-  }
+// MongoDB Bağlantısı
+if (process.env.MONGODB_URI) {
+  mongoose.connect(process.env.MONGODB_URI).then(() => console.log('MongoDB veritabanına başarıyla bağlanıldı!'))
+    .catch(err => console.error('MongoDB bağlantı hatası:', err));
+} else {
+  console.log('UYARI: MONGODB_URI .env dosyasında bulunamadı. Veritabanı işlemleri çalışmayacaktır.');
+}
+
+// Cloudinary Ayarları
+if (process.env.CLOUDINARY_CLOUD_NAME) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
+  console.log('Cloudinary başarıyla yapılandırıldı!');
+} else {
+  console.log('UYARI: Cloudinary API bilgileri .env dosyasında bulunamadı. Görsel yüklemeleri çalışmayacaktır.');
+}
+
+// Cloudinary Storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'ferit_haber',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+  },
 });
 
-// Haber Görseli Yükleme
-const newsStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, 'uploads')),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `news-${Date.now()}-${Math.round(Math.random() * 1E9)}${ext}`);
-  }
-});
-const uploadNews = multer({
-  storage: newsStorage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB per file
-});
+const upload = multer({ storage: storage });
 
-// JWT Middleware
 const verifyToken = (req, res, next) => {
   const token = req.headers['authorization'];
   if (!token) return res.status(403).json({ message: 'Token bulunamadı.' });
+
   try {
     const decoded = jwt.verify(token.split(' ')[1], SECRET_KEY);
     req.user = decoded;
@@ -65,39 +62,62 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// Profil fotoğrafı yükleme endpoint
-app.post('/api/upload/profile', verifyToken, upload.single('photo'), (req, res) => {
-  if (!req.file) return res.status(400).json({ message: 'Dosya yüklenmedi.' });
+// Ana Görsel Yükleme (Artık Cloudinary'e)
+app.post('/api/upload/news-image', verifyToken, upload.single('image'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: 'Görsel yüklenemedi. (Cloudinary bilgileri eksik olabilir)' });
+  }
+  res.json({ url: req.file.path, message: 'Görsel başarıyla Cloudinary\'e yüklendi!' });
+});
 
-  const photoUrl = `http://localhost:${PORT}/uploads/${req.file.filename}`;
+// Çoklu Görsel Yükleme (Artık Cloudinary'e)
+app.post('/api/upload/news-gallery', verifyToken, upload.array('images', 20), (req, res) => {
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).json({ message: 'Görsel seçilmedi' });
+  }
+  const urls = req.files.map(file => file.path);
+  res.json({ urls, message: 'Galerideki görseller başarıyla Cloudinary\'e yüklendi!' });
+});
 
-  // settings.json'a kaydet
-  const settingsPath = path.join(__dirname, 'data/settings.json');
+// Settings GET (MongoDB'den)
+app.get('/api/settings', async (req, res) => {
   try {
-    const settings = JSON.parse(fs.readFileSync(settingsPath));
-    settings.profilePhoto = photoUrl;
-    fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
-    res.json({ message: 'Fotoğraf yüklendi.', photoUrl });
-  } catch (e) {
-    res.status(500).json({ message: 'Ayarlar güncellenemedi.' });
+    if (!process.env.MONGODB_URI) return res.json({ bio: "MongoDB Bağlantısı Bekleniyor..." });
+    let settings = await Settings.findOne();
+    if (!settings) {
+      settings = await Settings.create({
+        profilePhoto: 'https://images.unsplash.com/photo-1556157382-97eda2d62296',
+        name: 'Ferit Tercan',
+        bio: 'Merhaba, ben Ferit Tercan.',
+        bio2: '', bio3: '', bio4: ''
+      });
+    }
+    res.json(settings);
+  } catch (error) {
+    res.status(500).json({ message: 'Sunucu hatası' });
   }
 });
 
-// Haber tekli görsel yükleme (Ana Görsel)
-app.post('/api/upload/news-image', verifyToken, uploadNews.single('image'), (req, res) => {
-  if (!req.file) return res.status(400).json({ message: 'Dosya yüklenmedi.' });
-  const photoUrl = `http://localhost:${PORT}/uploads/${req.file.filename}`;
-  res.json({ url: photoUrl });
+// Settings PUT (MongoDB'ye)
+app.put('/api/settings', verifyToken, async (req, res) => {
+  try {
+    let settings = await Settings.findOne();
+    if (!settings) {
+      settings = new Settings(req.body);
+    } else {
+      Object.assign(settings, req.body);
+    }
+    await settings.save();
+    res.json({ message: 'Ayarlar güncellendi', data: settings });
+  } catch (error) {
+    res.status(500).json({ message: 'Sunucu hatası' });
+  }
 });
 
-// Haber çoklu görsel yükleme (Galeri, max 20)
-app.post('/api/upload/news-gallery', verifyToken, uploadNews.array('images', 20), (req, res) => {
-  if (!req.files || req.files.length === 0) return res.status(400).json({ message: 'Dosya yüklenmedi.' });
-  const urls = req.files.map(file => `http://localhost:${PORT}/uploads/${file.filename}`);
-  res.json({ urls });
-});
+// Haberler Rotası
+app.use('/api/news', newsRoutes);
 
-// Basit Admin Girişi
+// Admin Girişi
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
   if (username === 'Ferittercan' && password === 'ferit06.06') {
@@ -107,10 +127,7 @@ app.post('/api/login', (req, res) => {
   return res.status(401).json({ message: 'Geçersiz kullanıcı adı veya şifre' });
 });
 
-// Rotalar
-app.use('/api/news', newsRoutes);
-app.use('/api/settings', settingsRoutes);
-
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
-  console.log(`Backend sunucusu http://localhost:${PORT} üzerinde çalışıyor.`);
+  console.log(`Backend sunucusu (Vercel Edition) http://localhost:${PORT} üzerinde çalışıyor.`);
 });

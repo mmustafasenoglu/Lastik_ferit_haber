@@ -1,28 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
 const jwt = require('jsonwebtoken');
+const News = require('../models/News');
 
-const dataPath = path.join(__dirname, '../data/news.json');
 const SECRET_KEY = process.env.JWT_SECRET || 'ferit123supersecret';
 
-// Veriyi Oku
-const readData = () => {
-    try {
-        const rawData = fs.readFileSync(dataPath);
-        return JSON.parse(rawData);
-    } catch (error) {
-        return [];
-    }
-};
-
-// Veriyi Yaz
-const writeData = (data) => {
-    fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
-};
-
-// JWT Middleware
 const verifyToken = (req, res, next) => {
     const token = req.headers['authorization'];
     if (!token) return res.status(403).json({ message: 'Token bulunamadı.' });
@@ -37,44 +19,48 @@ const verifyToken = (req, res, next) => {
 };
 
 // Tüm haberleri getir
-router.get('/', (req, res) => {
-    const news = readData();
-    res.json(news);
+router.get('/', async (req, res) => {
+    try {
+        if (!process.env.MONGODB_URI) return res.json([]);
+        const news = await News.find().sort({ date: -1 }); // Yeniden eskiye sıralı
+        res.json(news);
+    } catch (err) {
+        res.status(500).json({ message: 'Haberler getirilemedi' });
+    }
 });
 
 // Yeni haber ekle
-router.post('/', verifyToken, (req, res) => {
+router.post('/', verifyToken, async (req, res) => {
     const { title, content, imageUrl, additionalImages, category } = req.body;
     if (!title || !content) return res.status(400).json({ message: 'Başlık ve içerik zorunludur.' });
 
-    const news = readData();
-    const newEntry = {
-        id: Date.now().toString(),
-        title,
-        content,
-        category: category || 'Genel',
-        imageUrl: imageUrl || 'https://via.placeholder.com/400x250',
-        additionalImages: additionalImages || [],
-        date: new Date().toISOString()
-    };
-    
-    news.unshift(newEntry);
-    writeData(news);
-    
-    res.status(201).json({ message: 'Haber eklendi', id: newEntry.id, data: newEntry });
+    try {
+        const newEntry = new News({
+            title,
+            content,
+            category: category || 'Genel',
+            imageUrl: imageUrl || 'https://via.placeholder.com/400x250',
+            additionalImages: additionalImages || []
+        });
+        
+        await newEntry.save();
+        res.status(201).json({ message: 'Haber eklendi', id: newEntry.id, data: newEntry });
+    } catch (err) {
+        res.status(500).json({ message: 'Haber eklenemedi' });
+    }
 });
 
 // Haber sil
-router.delete('/:id', verifyToken, (req, res) => {
-    let news = readData();
-    const filteredNews = news.filter(item => item.id !== req.params.id);
-    
-    if (news.length === filteredNews.length) {
-        return res.status(404).json({ message: 'Haber bulunamadı.' });
+router.delete('/:id', verifyToken, async (req, res) => {
+    try {
+        const result = await News.findByIdAndDelete(req.params.id);
+        if (!result) {
+            return res.status(404).json({ message: 'Haber bulunamadı.' });
+        }
+        res.json({ message: 'Haber silindi.' });
+    } catch (err) {
+        res.status(500).json({ message: 'Silme işlemi başarısız' });
     }
-    
-    writeData(filteredNews);
-    res.json({ message: 'Haber silindi.' });
 });
 
 module.exports = router;
