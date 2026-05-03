@@ -77,6 +77,14 @@ app.post('/api/upload/news-image', verifyToken, upload.single('image'), (req, re
   res.json({ url: req.file.path, message: 'Görsel başarıyla Cloudinary\'e yüklendi!' });
 });
 
+// Profil Fotoğrafı Yükleme (Cloudinary'e)
+app.post('/api/upload/profile', verifyToken, upload.single('photo'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: 'Profil fotoğrafı yüklenemedi.' });
+  }
+  res.json({ photoUrl: req.file.path, message: 'Profil fotoğrafı başarıyla yüklendi!' });
+});
+
 // Çoklu Görsel Yükleme (Artık Cloudinary'e)
 app.post('/api/upload/news-gallery', verifyToken, upload.array('images', 20), (req, res) => {
   if (!req.files || req.files.length === 0) {
