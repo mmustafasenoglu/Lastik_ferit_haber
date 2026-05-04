@@ -5,6 +5,7 @@ const newsSchema = new mongoose.Schema({
   content: { type: String, required: true },
   category: { type: String, default: 'Genel' },
   imageUrl: { type: String, default: '' },
+  imageCaption: { type: String, default: '' },
   additionalImages: { type: [String], default: [] },
   date: { type: Date, default: Date.now }
 });

@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
 
 // Yeni haber ekle
 router.post('/', verifyToken, async (req, res) => {
-    const { title, content, imageUrl, additionalImages, category } = req.body;
+    const { title, content, imageUrl, imageCaption, additionalImages, category } = req.body;
     if (!title || !content) return res.status(400).json({ message: 'Başlık ve içerik zorunludur.' });
 
     try {
@@ -40,6 +40,7 @@ router.post('/', verifyToken, async (req, res) => {
             content,
             category: category || 'Genel',
             imageUrl: imageUrl || 'https://via.placeholder.com/400x250',
+            imageCaption: imageCaption || '',
             additionalImages: additionalImages || []
         });
         

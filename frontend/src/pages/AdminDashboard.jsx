@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const AdminDashboard = () => {
   const [news, setNews] = useState([]);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [imageCaption, setImageCaption] = useState('');
   const [additionalImages, setAdditionalImages] = useState([]);
   const [category, setCategory] = useState('Genel');
 
@@ -97,10 +100,10 @@ const AdminDashboard = () => {
     e.preventDefault();
     try {
       await axios.post('/api/news',
-        { title, content, imageUrl, additionalImages, category },
+        { title, content, imageUrl, imageCaption, additionalImages, category },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setTitle(''); setContent(''); setImageUrl(''); setAdditionalImages([]); setCategory('Genel');
+      setTitle(''); setContent(''); setImageUrl(''); setImageCaption(''); setAdditionalImages([]); setCategory('Genel');
       fetchNews();
     } catch (err) { console.error('Haber eklenemedi.', err); }
   };
@@ -290,8 +293,14 @@ const AdminDashboard = () => {
                 {imageUrl && <img src={imageUrl} alt="Önizleme" className="mt-2 h-24 object-cover rounded shadow" />}
               </div>
               <div>
+                <label className="block text-gray-700 text-sm font-bold mb-2">Ana Görsel Alt Yazısı (Opsiyonel)</label>
+                <input type="text" placeholder="Röportaj yapılan kişinin adı, soyadı vb." className="w-full p-2 border rounded focus:outline-none focus:border-blue-500" value={imageCaption} onChange={e => setImageCaption(e.target.value)} />
+              </div>
+              <div className="mb-12 pb-10">
                 <label className="block text-gray-700 text-sm font-bold mb-2">İçerik</label>
-                <textarea className="w-full p-2 border rounded focus:outline-none focus:border-blue-500 h-32" value={content} onChange={e => setContent(e.target.value)} required></textarea>
+                <div className="h-48 mb-6">
+                  <ReactQuill theme="snow" value={content} onChange={setContent} className="h-full" />
+                </div>
               </div>
               <div>
                 <label className="block text-gray-700 text-sm font-bold mb-2">Ekstra Görseller (Maks 20 - Haber İçeriği Altı İçin)</label>

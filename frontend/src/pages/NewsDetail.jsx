@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import DOMPurify from 'dompurify';
 
 const NewsDetail = () => {
   const { id } = useParams();
@@ -32,7 +33,14 @@ const NewsDetail = () => {
         
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
           {newsItem.imageUrl && (
-            <img src={newsItem.imageUrl} alt={newsItem.title} className="w-full h-[400px] md:h-[500px] object-cover" />
+            <div className="relative">
+              <img src={newsItem.imageUrl} alt={newsItem.title} className="w-full h-[400px] md:h-[500px] object-cover" />
+              {newsItem.imageCaption && (
+                <div className="text-center py-2 text-sm text-gray-500 italic bg-gray-50 border-b border-gray-100">
+                  {newsItem.imageCaption}
+                </div>
+              )}
+            </div>
           )}
           
           <div className="p-8 md:p-12">
@@ -49,9 +57,10 @@ const NewsDetail = () => {
               {newsItem.title}
             </h1>
             
-            <div className="prose prose-lg max-w-none text-gray-900 font-semibold leading-relaxed mb-12 whitespace-pre-wrap">
-              {newsItem.content}
-            </div>
+            <div 
+              className="prose prose-lg max-w-none text-gray-900 font-medium leading-relaxed mb-12 whitespace-normal"
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(newsItem.content) }}
+            />
 
             {/* Ekstra Görseller (Galeri) */}
             {newsItem.additionalImages && newsItem.additionalImages.length > 0 && (
