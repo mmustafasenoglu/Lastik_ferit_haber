@@ -12,27 +12,27 @@ const Navbar = () => {
   }, [location]);
 
   return (
-    <nav className="w-full bg-[#1a1a2e] text-white px-6 md:px-8 py-3 flex justify-between items-center shadow-lg sticky top-0 z-40 border-b border-white/5">
+    <nav className="w-full bg-[#1a1a2e] text-white px-6 md:px-8 py-2 flex justify-between items-center shadow-lg sticky top-0 z-40 border-b border-white/5">
       <div className="flex items-center gap-2 relative z-50">
         <Link to="/" className="flex items-center gap-4 group">
           {/* F/T Logo */}
-          <svg width="48" height="48" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
+          <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
             <circle cx="50" cy="50" r="46" fill="#1a1a2e" stroke="white" strokeWidth="3"/>
             <text textAnchor="middle" x="28" y="66" fontFamily="Georgia, serif" fontSize="46" fontWeight="bold" fill="white">F</text>
             <text textAnchor="middle" x="50" y="66" fontFamily="Georgia, serif" fontSize="38" fontWeight="400" fill="#c0392b">/</text>
             <text textAnchor="middle" x="73" y="66" fontFamily="Georgia, serif" fontSize="46" fontWeight="bold" fill="white">T</text>
           </svg>
           
-          <div className="flex items-center font-serif text-xl md:text-2xl tracking-[0.1em] font-black text-white uppercase hidden sm:flex">
+          <div className="flex items-center font-serif text-lg md:text-xl tracking-[0.1em] font-black text-white uppercase hidden sm:flex">
             <span>FERIT</span>
-            <span className="mx-2 text-red-500 font-light">/</span>
+            <span className="mx-1.5 text-red-500 font-light">/</span>
             <span>TERCAN</span>
           </div>
         </Link>
       </div>
 
       {/* Masaüstü Menü */}
-      <div className="hidden md:flex gap-8 font-bold tracking-wide text-base">
+      <div className="hidden md:flex gap-6 font-bold tracking-wider text-sm">
         <Link to="/" className="hover:text-red-400 transition-colors uppercase">Ana Sayfa</Link>
         <Link to="/haberler" className="hover:text-red-400 transition-colors uppercase">Haberler</Link>
         <Link to="/hakkimda" className="hover:text-red-400 transition-colors uppercase">Hakkımda</Link>
