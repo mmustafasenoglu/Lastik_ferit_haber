@@ -12,7 +12,7 @@ const Navbar = () => {
   }, [location]);
 
   return (
-    <nav className="w-full bg-[#1a1a2e] text-white px-6 md:px-8 py-2 flex justify-between items-center shadow-lg sticky top-0 z-40 border-b border-white/5">
+    <nav className="w-full bg-[#1a1a2e] text-white px-6 md:px-8 py-3 flex justify-between items-center shadow-lg sticky top-0 z-40 border-b border-white/5">
       <div className="flex items-center gap-2 relative z-50">
         <Link to="/" className="flex items-center gap-4 group">
           {/* F/T Logo */}
