@@ -14,6 +14,7 @@ const AdminDashboard = () => {
   const [imageCaption, setImageCaption] = useState('');
   const [additionalImages, setAdditionalImages] = useState([]);
   const [category, setCategory] = useState('Sağlık');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
   // Yükleme stateleri
   const [newsImageUploading, setNewsImageUploading] = useState(false);
@@ -26,6 +27,7 @@ const AdminDashboard = () => {
   const [editImageUrl, setEditImageUrl] = useState('');
   const [editImageCaption, setEditImageCaption] = useState('');
   const [editCategory, setEditCategory] = useState('Sağlık');
+  const [editDate, setEditDate] = useState('');
   const [editSaving, setEditSaving] = useState(false);
 
   // Editör Modları
@@ -115,10 +117,10 @@ const AdminDashboard = () => {
     e.preventDefault();
     try {
       await axios.post('/api/news',
-        { title, content, imageUrl, imageCaption, additionalImages, category },
+        { title, content, imageUrl, imageCaption, additionalImages, category, date },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setTitle(''); setContent(''); setImageUrl(''); setImageCaption(''); setAdditionalImages([]); setCategory('Sağlık');
+      setTitle(''); setContent(''); setImageUrl(''); setImageCaption(''); setAdditionalImages([]); setCategory('Sağlık'); setDate(new Date().toISOString().split('T')[0]);
       fetchNews();
     } catch (err) { console.error('Haber eklenemedi.', err); }
   };
@@ -181,6 +183,7 @@ const AdminDashboard = () => {
     setEditImageUrl(item.imageUrl || '');
     setEditImageCaption(item.imageCaption || '');
     setEditCategory(item.category || 'Sağlık');
+    setEditDate(new Date(item.date).toISOString().split('T')[0]);
   };
 
   const handleUpdate = async (e) => {
@@ -188,7 +191,7 @@ const AdminDashboard = () => {
     setEditSaving(true);
     try {
       await axios.put(`/api/news/${editingNews.id}`,
-        { title: editTitle, content: editContent, imageUrl: editImageUrl, imageCaption: editImageCaption, category: editCategory, additionalImages: editingNews.additionalImages || [] },
+        { title: editTitle, content: editContent, imageUrl: editImageUrl, imageCaption: editImageCaption, category: editCategory, date: editDate, additionalImages: editingNews.additionalImages || [] },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setEditingNews(null);
@@ -323,6 +326,10 @@ const AdminDashboard = () => {
                 </select>
               </div>
               <div>
+                <label className="block text-gray-700 text-sm font-bold mb-2">Haber Tarihi</label>
+                <input type="date" className="w-full p-2 border rounded focus:outline-none focus:border-blue-500" value={date} onChange={e => setDate(e.target.value)} />
+              </div>
+              <div>
                 <label className="block text-gray-700 text-sm font-bold mb-2">Ana Görsel (URL veya Yükle)</label>
                 <div className="flex gap-2 items-center">
                   <input type="text" placeholder="Görsel URL'si girin veya yanda yükleyin" className="w-full p-2 border rounded focus:outline-none focus:border-blue-500" value={imageUrl} onChange={e => setImageUrl(e.target.value)} />
@@ -450,6 +457,10 @@ const AdminDashboard = () => {
                   <option value="Yerel Haber">Yerel Haber</option>
                   <option value="Yaşam">Yaşam</option>
                 </select>
+              </div>
+              <div>
+                <label className="block text-gray-700 text-sm font-bold mb-2">Haber Tarihi</label>
+                <input type="date" className="w-full p-2 border rounded focus:outline-none focus:border-blue-500" value={editDate} onChange={e => setEditDate(e.target.value)} />
               </div>
               <div>
                 <label className="block text-gray-700 text-sm font-bold mb-2">Ana Görsel URL</label>

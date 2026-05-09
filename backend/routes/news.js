@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
 
 // Yeni haber ekle
 router.post('/', verifyToken, async (req, res) => {
-    const { title, content, imageUrl, imageCaption, additionalImages, category } = req.body;
+    const { title, content, imageUrl, imageCaption, additionalImages, category, date } = req.body;
     if (!title || !content) return res.status(400).json({ message: 'Başlık ve içerik zorunludur.' });
 
     try {
@@ -41,7 +41,8 @@ router.post('/', verifyToken, async (req, res) => {
             category: category || 'Genel',
             imageUrl: imageUrl || 'https://via.placeholder.com/400x250',
             imageCaption: imageCaption || '',
-            additionalImages: additionalImages || []
+            additionalImages: additionalImages || [],
+            date: date || Date.now()
         });
         
         await newEntry.save();
@@ -53,11 +54,11 @@ router.post('/', verifyToken, async (req, res) => {
 
 // Haber güncelle
 router.put('/:id', verifyToken, async (req, res) => {
-    const { title, content, imageUrl, imageCaption, additionalImages, category } = req.body;
+    const { title, content, imageUrl, imageCaption, additionalImages, category, date } = req.body;
     try {
         const updated = await News.findByIdAndUpdate(
             req.params.id,
-            { title, content, imageUrl, imageCaption, additionalImages, category },
+            { title, content, imageUrl, imageCaption, additionalImages, category, date },
             { new: true }
         );
         if (!updated) return res.status(404).json({ message: 'Haber bulunamadı.' });
