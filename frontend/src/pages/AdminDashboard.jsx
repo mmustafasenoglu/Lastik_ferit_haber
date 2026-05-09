@@ -28,6 +28,10 @@ const AdminDashboard = () => {
   const [editCategory, setEditCategory] = useState('Sağlık');
   const [editSaving, setEditSaving] = useState(false);
 
+  // Editör Modları
+  const [isHtmlMode, setIsHtmlMode] = useState(false);
+  const [isEditHtmlMode, setIsEditHtmlMode] = useState(false);
+
   // Profil ayarları
   const [profilePhoto, setProfilePhoto] = useState('');
   const [bio, setBio] = useState('');
@@ -333,11 +337,39 @@ const AdminDashboard = () => {
                 <label className="block text-gray-700 text-sm font-bold mb-2">Ana Görsel Alt Yazısı (Opsiyonel)</label>
                 <input type="text" placeholder="Röportaj yapılan kişinin adı, soyadı vb." className="w-full p-2 border rounded focus:outline-none focus:border-blue-500" value={imageCaption} onChange={e => setImageCaption(e.target.value)} />
               </div>
-              <div className="mb-12 pb-10">
-                <label className="block text-gray-700 text-sm font-bold mb-2">İçerik</label>
-                <div className="h-48 mb-6">
-                  <ReactQuill theme="snow" value={content} onChange={setContent} className="h-full" />
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <label className="block text-gray-700 text-sm font-bold">İçerik</label>
+                  <button
+                    type="button"
+                    onClick={() => setIsHtmlMode(!isHtmlMode)}
+                    className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-1 rounded border transition"
+                  >
+                    {isHtmlMode ? '👁️ Görsel Editöre Dön' : '💻 HTML Kodu Yaz'}
+                  </button>
                 </div>
+                
+                {isHtmlMode ? (
+                  <div className="grid grid-cols-1 gap-4 border rounded-lg overflow-hidden">
+                    <div className="bg-[#1e1e2e] p-2">
+                      <div className="text-[10px] text-gray-400 uppercase font-bold mb-1 px-1">HTML Kodu</div>
+                      <textarea
+                        className="w-full h-64 bg-transparent text-gray-300 font-mono text-sm p-2 focus:outline-none resize-none"
+                        value={content}
+                        onChange={e => setContent(e.target.value)}
+                        placeholder="<p>Haber içeriği...</p>"
+                      />
+                    </div>
+                    <div className="bg-white border-t p-4 h-64 overflow-y-auto prose prose-sm max-w-none">
+                      <div className="text-[10px] text-blue-500 uppercase font-bold mb-2">Canlı Önizleme</div>
+                      <div dangerouslySetInnerHTML={{ __html: content }} />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="h-64 mb-12">
+                    <ReactQuill theme="snow" value={content} onChange={setContent} className="h-full" />
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-gray-700 text-sm font-bold mb-2">Ekstra Görseller (Maks 20 - Haber İçeriği Altı İçin)</label>
@@ -428,11 +460,38 @@ const AdminDashboard = () => {
                 <label className="block text-gray-700 text-sm font-bold mb-2">Görsel Alt Yazısı</label>
                 <input type="text" className="w-full p-2 border rounded focus:outline-none focus:border-blue-500" value={editImageCaption} onChange={e => setEditImageCaption(e.target.value)} />
               </div>
-              <div className="mb-16 pb-10">
-                <label className="block text-gray-700 text-sm font-bold mb-2">İçerik</label>
-                <div className="h-48 mb-6">
-                  <ReactQuill theme="snow" value={editContent} onChange={setEditContent} className="h-full" />
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <label className="block text-gray-700 text-sm font-bold">İçerik</label>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditHtmlMode(!isEditHtmlMode)}
+                    className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-1 rounded border transition"
+                  >
+                    {isEditHtmlMode ? '👁️ Görsel Editöre Dön' : '💻 HTML Kodu Yaz'}
+                  </button>
                 </div>
+
+                {isEditHtmlMode ? (
+                  <div className="flex flex-col border rounded-lg overflow-hidden">
+                    <div className="bg-[#1e1e2e] p-2 border-b border-gray-800">
+                      <div className="text-[10px] text-gray-400 uppercase font-bold mb-1 px-1">HTML Kodu</div>
+                      <textarea
+                        className="w-full h-48 bg-transparent text-gray-300 font-mono text-sm p-2 focus:outline-none resize-none"
+                        value={editContent}
+                        onChange={e => setEditContent(e.target.value)}
+                      />
+                    </div>
+                    <div className="bg-white p-4 h-48 overflow-y-auto prose prose-sm max-w-none">
+                      <div className="text-[10px] text-blue-500 uppercase font-bold mb-2">Canlı Önizleme</div>
+                      <div dangerouslySetInnerHTML={{ __html: editContent }} />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="h-64 mb-12">
+                    <ReactQuill theme="snow" value={editContent} onChange={setEditContent} className="h-full" />
+                  </div>
+                )}
               </div>
               <div className="flex gap-3 pt-2">
                 <button type="submit" disabled={editSaving} className="flex-1 bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 disabled:opacity-60 transition">
