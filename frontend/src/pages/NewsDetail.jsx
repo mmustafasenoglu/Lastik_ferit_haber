@@ -61,7 +61,10 @@ const NewsDetail = () => {
             </h1>
             
             <div 
-              className="prose prose-lg max-w-none text-gray-900 font-medium leading-relaxed mb-12 whitespace-normal"
+              className="prose prose-lg max-w-none text-gray-800 leading-relaxed mb-12 whitespace-normal
+                prose-p:font-medium prose-p:text-gray-800 prose-p:mb-6 
+                prose-headings:text-gray-900 prose-headings:font-serif prose-headings:mb-4
+                prose-strong:font-bold prose-strong:text-black"
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(newsItem.content) }}
             />
 

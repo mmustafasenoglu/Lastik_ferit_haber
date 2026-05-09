@@ -466,11 +466,13 @@ const AdminDashboard = () => {
                 <label className="block text-gray-700 text-sm font-bold mb-2">Görsel Alt Yazısı</label>
                 <input type="text" className="w-full p-2 border rounded focus:outline-none focus:border-blue-500" value={editImageCaption} onChange={e => setEditImageCaption(e.target.value)} />
               </div>
-              <div className="mb-12">
-                <label className="block text-gray-700 text-sm font-bold mb-2">İçerik</label>
-                <ReactQuill theme="snow" value={editContent} onChange={setEditContent} modules={modules} className="h-64" />
+              <div className="pb-12 border-b border-gray-100">
+                <label className="block text-gray-700 text-sm font-bold mb-2 text-blue-600">İçerik</label>
+                <div className="h-72">
+                  <ReactQuill theme="snow" value={editContent} onChange={setEditContent} modules={modules} className="h-full" />
+                </div>
               </div>
-              <div>
+              <div className="pt-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">Ekstra Görseller Alt Yazısı</label>
                 <input type="text" className="w-full p-2 border rounded focus:outline-none focus:border-blue-500" value={editGalleryCaption} onChange={e => setEditGalleryCaption(e.target.value)} />
               </div>
