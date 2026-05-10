@@ -65,7 +65,7 @@ const NewsDetail = () => {
                 prose-p:font-medium prose-p:text-gray-800 prose-p:mb-6 
                 prose-headings:text-gray-900 prose-headings:font-serif prose-headings:mb-4
                 prose-strong:font-bold prose-strong:text-black"
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(newsItem.content) }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(newsItem.content, { FORBID_TAGS: ['wbr'] }) }}
             />
 
             {/* Ekstra Görseller (Galeri) */}
