@@ -36,8 +36,8 @@ const NewsSection = () => {
                 <div className="text-xs text-accent font-bold mb-3 tracking-widest uppercase">
                   {new Date(item.date).toLocaleDateString('tr-TR')}
                 </div>
-                <h3 className="text-2xl font-bold text-primary mb-4 leading-tight break-words">{item.title}</h3>
-                <p className="text-gray-600 line-clamp-3 break-words">
+                <h3 className="text-2xl font-bold text-primary mb-4 leading-tight">{item.title}</h3>
+                <p className="text-gray-600 line-clamp-3">
                   {stripHtml(item.content)}
                 </p>
                 <div className="mt-6">

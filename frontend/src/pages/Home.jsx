@@ -48,8 +48,8 @@ const Home = () => {
                   <span className="bg-accent text-white px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-md mb-4 inline-block">
                     {item.category || 'Genel'}
                   </span>
-                  <h2 className="text-3xl md:text-5xl font-serif font-bold mb-4 leading-tight break-words">{item.title}</h2>
-                  <p className="text-gray-200 line-clamp-2 md:w-2/3 text-lg break-words">{stripHtml(item.content)}</p>
+                  <h2 className="text-3xl md:text-5xl font-serif font-bold mb-4 leading-tight">{item.title}</h2>
+                  <p className="text-gray-200 line-clamp-2 md:w-2/3 text-lg">{stripHtml(item.content)}</p>
                 </div>
               </div>
             ))}
@@ -94,8 +94,8 @@ const Home = () => {
                     <div className="text-xs text-gray-400 font-bold mb-2">
                       {new Date(item.date).toLocaleDateString('tr-TR')}
                     </div>
-                    <h4 className="text-xl font-bold text-[#1e3a8a] mb-3 leading-snug hover:text-red-600 transition-colors cursor-pointer break-words">{item.title}</h4>
-                    <p className="text-gray-900 font-semibold line-clamp-3 mb-6 flex-grow break-words">{stripHtml(item.content)}</p>
+                    <h4 className="text-xl font-bold text-[#1e3a8a] mb-3 leading-snug hover:text-red-600 transition-colors cursor-pointer">{item.title}</h4>
+                    <p className="text-gray-900 font-semibold line-clamp-3 mb-6 flex-grow">{stripHtml(item.content)}</p>
                     <a href={`/haber/${item.id}`} className="text-gray-500 font-bold text-sm uppercase tracking-wider hover:text-red-600 transition text-left mt-auto">
                       Devamını Oku &rarr;
                     </a>
