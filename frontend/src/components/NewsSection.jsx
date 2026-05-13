@@ -18,7 +18,8 @@ const NewsSection = () => {
   const stripHtml = (html) => {
     const tmp = document.createElement("DIV");
     tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || "";
+    let text = tmp.textContent || tmp.innerText || "";
+    return text.replace(/&nbsp;/g, ' ').replace(/\u00A0/g, ' ');
   };
 
   return (
@@ -36,8 +37,8 @@ const NewsSection = () => {
                 <div className="text-xs text-accent font-bold mb-3 tracking-widest uppercase">
                   {new Date(item.date).toLocaleDateString('tr-TR')}
                 </div>
-                <h3 className="text-2xl font-bold text-primary mb-4 leading-tight">{item.title}</h3>
-                <p className="text-gray-600 line-clamp-3">
+                <h3 className="text-2xl font-bold text-primary mb-4 leading-tight break-words">{item.title}</h3>
+                <p className="text-gray-600 line-clamp-3 break-words whitespace-pre-wrap">
                   {stripHtml(item.content)}
                 </p>
                 <div className="mt-6">

@@ -22,7 +22,8 @@ const News = () => {
   const stripHtml = (html) => {
     const tmp = document.createElement("DIV");
     tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || "";
+    let text = tmp.textContent || tmp.innerText || "";
+    return text.replace(/&nbsp;/g, ' ').replace(/\u00A0/g, ' ');
   };
 
   return (
@@ -66,8 +67,8 @@ const News = () => {
                   <div className="text-xs text-gray-400 font-bold mb-2">
                     {new Date(item.date).toLocaleDateString('tr-TR')}
                   </div>
-                  <h4 className="text-xl font-bold text-primary mb-3 leading-snug">{item.title}</h4>
-                  <p className="text-gray-900 font-semibold line-clamp-3 mb-6 flex-grow">{stripHtml(item.content)}</p>
+                  <h4 className="text-xl font-bold text-primary mb-3 leading-snug break-words">{item.title}</h4>
+                  <p className="text-gray-900 font-semibold line-clamp-3 mb-6 flex-grow break-words whitespace-pre-wrap">{stripHtml(item.content)}</p>
                   <a href={`/haber/${item.id}`} className="text-accent font-bold text-sm uppercase tracking-wider hover:text-blue-800 transition text-left mt-auto block">
                     Devamını Oku &rarr;
                   </a>
