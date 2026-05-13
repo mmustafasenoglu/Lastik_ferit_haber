@@ -29,8 +29,8 @@ const NewsSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {news.map((item) => (
             <div key={item.id} className="bg-gray-50 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
-              <div className="h-48 overflow-hidden bg-gray-200">
-                <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                <div className="h-48 overflow-hidden bg-gray-100 flex items-center justify-center">
+                  <img src={item.imageUrl} alt={item.title} className="w-full h-full object-contain" />
               </div>
               <div className="p-8">
                 <div className="text-xs text-accent font-bold mb-3 tracking-widest uppercase">

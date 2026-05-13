@@ -56,11 +56,11 @@ const News = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredNews.map(item => (
               <div key={item.id} className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full border border-gray-100">
-                <div className="h-48 overflow-hidden relative">
-                  <span className="absolute top-4 left-4 bg-primary text-white text-xs font-bold uppercase px-3 py-1 rounded shadow-lg z-10">
-                    {item.category || 'Genel'}
-                  </span>
-                  <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500" />
+                  <div className="h-48 overflow-hidden relative bg-gray-50 flex items-center justify-center">
+                    <span className="absolute top-4 left-4 bg-primary text-white text-xs font-bold uppercase px-3 py-1 rounded shadow-lg z-10">
+                      {item.category || 'Genel'}
+                    </span>
+                    <img src={item.imageUrl} alt={item.title} className="w-full h-full object-contain transform hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div className="p-6 flex flex-col flex-grow">
                   <div className="text-xs text-gray-400 font-bold mb-2">

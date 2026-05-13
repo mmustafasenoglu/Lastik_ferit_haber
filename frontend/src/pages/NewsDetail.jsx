@@ -53,8 +53,8 @@ const NewsDetail = () => {
 
           {/* ANA GÖRSEL */}
           {newsItem.imageUrl && (
-            <div className="relative">
-              <img src={newsItem.imageUrl} alt={newsItem.title} className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover" />
+              <div className="relative bg-gray-50">
+                <img src={newsItem.imageUrl} alt={newsItem.title} className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-contain" />
               {newsItem.imageCaption && (
                 <div className="text-center py-2 text-xs md:text-sm text-gray-500 italic bg-gray-50 border-b border-gray-100">
                   {newsItem.imageCaption}
