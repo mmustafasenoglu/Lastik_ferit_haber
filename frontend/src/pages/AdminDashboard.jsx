@@ -178,7 +178,7 @@ const AdminDashboard = () => {
       const res = await axios.post('/api/upload/news-gallery', formData, {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
       });
-      setAdditionalImages(res.data.urls);
+      setAdditionalImages(prev => [...prev, ...res.data.urls.map(url => ({ url, caption: '' }))]);
     } catch {
       alert('Galeri görselleri yüklenemedi.');
     } finally {
@@ -380,12 +380,31 @@ const AdminDashboard = () => {
                   <input type="file" accept="image/*" multiple className="hidden" onChange={handleGalleryUpload} />
                 </label>
                 {additionalImages.length > 0 && (
-                  <div className="mt-3 grid grid-cols-4 sm:grid-cols-5 gap-2">
-                    {additionalImages.map((img, i) => (
-                      <div key={i} className="relative aspect-square">
-                        <img src={img} alt="Galeri" className="w-full h-full object-cover rounded shadow-sm border" />
-                      </div>
-                    ))}
+                  <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {additionalImages.map((img, i) => {
+                      const url = typeof img === 'object' && img !== null ? img.url : img;
+                      const caption = typeof img === 'object' && img !== null ? img.caption : '';
+                      return (
+                        <div key={i} className="relative flex flex-col gap-2 p-2 border rounded bg-white shadow-sm">
+                          <img src={url} alt="Galeri" className="w-full h-32 object-contain bg-gray-100 rounded" />
+                          <button type="button" onClick={() => {
+                            const newImgs = additionalImages.filter((_, idx) => idx !== i);
+                            setAdditionalImages(newImgs);
+                          }} className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow hover:bg-red-600">×</button>
+                          <input 
+                            type="text" 
+                            placeholder="Kişi Adı / Alt Yazı" 
+                            className="w-full p-1 border rounded text-sm focus:outline-none focus:border-blue-500" 
+                            value={caption} 
+                            onChange={e => {
+                              const newImgs = [...additionalImages];
+                              newImgs[i] = { url, caption: e.target.value };
+                              setAdditionalImages(newImgs);
+                            }} 
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>

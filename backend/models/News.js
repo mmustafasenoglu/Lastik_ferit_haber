@@ -6,7 +6,7 @@ const newsSchema = new mongoose.Schema({
   category: { type: String, default: 'Genel' },
   imageUrl: { type: String, default: '' },
   imageCaption: { type: String, default: '' },
-  additionalImages: { type: [String], default: [] },
+  additionalImages: { type: mongoose.Schema.Types.Mixed, default: [] },
   galleryCaption: { type: String, default: '' },
   date: { type: Date, default: Date.now }
 });
