@@ -78,7 +78,7 @@ const NewsDetail = () => {
                   newsItem.content
                     .replace(/&nbsp;/g, ' ')
                     .replace(/\u00A0/g, ' '), 
-                  { FORBID_TAGS: ['wbr'] }
+                  { FORBID_TAGS: ['wbr'], ADD_ATTR: ['style', 'class'] }
                 ) 
               }}
             />

@@ -14,6 +14,11 @@ Font.whitelist = [
 ];
 Quill.register(Font, true);
 
+// Boyutları (Size) Quill'e kaydet
+const Size = Quill.import('attributors/style/size');
+Size.whitelist = ['10px', '12px', '14px', '16px', '18px', '20px', '24px', '30px', '36px'];
+Quill.register(Size, true);
+
 const AdminDashboard = () => {
   useDocumentTitle('Yönetim Paneli');
   const [news, setNews] = useState([]);
@@ -62,6 +67,7 @@ const AdminDashboard = () => {
   const modules = {
     toolbar: [
       [{ 'font': Font.whitelist }],
+      [{ 'size': ['10px', '12px', '14px', '16px', '18px', '20px', '24px', '30px', '36px', false] }],
       [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
       ['bold', 'italic', 'underline', 'strike'],
       [{ 'color': [] }, { 'background': [] }],
